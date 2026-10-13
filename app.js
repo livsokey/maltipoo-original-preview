@@ -3,6 +3,7 @@
   const $=(selector,scope=document)=>scope.querySelector(selector);
   const $$=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
   const escapeHTML=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const readableText=value=>escapeHTML(value).replace(/(^|[^А-Яа-яЁёA-Za-z0-9_])([ВвКкСсУуОоАаИи]|[Нн]о|[Нн]а|[Нн]е|[Пп]о|[Зз]а|[Дд]о|[Ии]з|[Сс]о|[Оо]б|[Оо]т|[Дд]ля|[Бб]ез) (?=[А-Яа-яЁёA-Za-z0-9])/g,'$1$2\u00a0');
   const manager='https://t.me/mariya_robbi';
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   const questions=[
@@ -30,7 +31,7 @@
     $('#quiz-progress-bar').value=Math.min(step+1,questions.length);
     if(step<questions.length){
       const q=questions[step];
-      $('#quiz-stage').innerHTML=`<fieldset><legend tabindex="-1">${q.title}</legend><div class="quiz-options">${q.options.map(([title,description],i)=>`<button type="button" class="quiz-option" data-answer="${i}" aria-pressed="${answers[q.key]===title}"><strong>${title}</strong>${description?`<small>${description}</small>`:''}<span class="option-indicator" aria-hidden="true"></span></button>`).join('')}</div></fieldset>`;
+      $('#quiz-stage').innerHTML=`<fieldset><legend tabindex="-1">${readableText(q.title)}</legend><div class="quiz-options">${q.options.map(([title,description],i)=>`<button type="button" class="quiz-option" data-answer="${i}" aria-pressed="${answers[q.key]===title}"><strong>${readableText(title)}</strong>${description?`<small>${readableText(description).replace(/(\d+,\d+(?:–\d+,\d+|\+) кг)$/, '<span style="white-space:nowrap">$1</span>')}</small>`:''}<span class="option-indicator" aria-hidden="true"></span></button>`).join('')}</div></fieldset>`;
       $$('[data-answer]',$('#quiz-stage')).forEach(button=>button.addEventListener('click',()=>{
         clearTimeout(advanceTimer);answers[q.key]=q.options[Number(button.dataset.answer)][0];
         $$('[data-answer]',$('#quiz-stage')).forEach(other=>other.setAttribute('aria-pressed',String(other===button)));
@@ -38,7 +39,7 @@
       }));
       if(focus)focusQuizHeading();
     }else{
-      $('#quiz-stage').innerHTML=`<div class="quiz-result"><h3 tabindex="-1">Посмотрим, кто вам подойдёт</h3><p>Перейдите в Telegram и отправьте свои пожелания. Пришлём актуальные фото, видео и цены.</p><ul>${questions.map(q=>`<li>${escapeHTML(answers[q.key]||'Не выбрано')}</li>`).join('')}</ul><a class="button" href="${telegramDraft()}" target="_blank" rel="noopener noreferrer">Продолжить в Telegram ↗</a><button type="button" class="quiz-edit" id="quiz-edit">Изменить ответы</button></div>`;
+      $('#quiz-stage').innerHTML=`<div class="quiz-result"><h3 tabindex="-1">Посмотрим, кто вам подойдёт</h3><p>Перейдите в Telegram и отправьте свои пожелания. Пришлём актуальные фото, видео и цены.</p><ul>${questions.map(q=>`<li>${readableText(answers[q.key]||'Не выбрано')}</li>`).join('')}</ul><a class="button" href="${telegramDraft()}" target="_blank" rel="noopener noreferrer">Продолжить в Telegram ↗</a><button type="button" class="quiz-edit" id="quiz-edit">Изменить ответы</button></div>`;
       $('#quiz-edit').addEventListener('click',()=>{step=0;renderQuiz(true);});
       if(focus)focusQuizHeading();
     }
