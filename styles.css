@@ -97,3 +97,30 @@ h2,h3,legend{text-wrap:balance}p,li,figcaption,.quiz-option strong{text-wrap:pre
 .quiz-live [hidden]{display:none!important}
 @media(max-width:980px){.selection-panel.quiz-live{grid-template-columns:minmax(0,1fr)}.quiz-live .quiz-side{display:none}}
 @media(max-width:640px){.quiz-live .quiz-content,.quiz-live.is-result .quiz-content{padding:24px 20px}.quiz-live .quiz-options{grid-template-columns:minmax(0,1fr)}.quiz-live .quiz-option{min-height:60px}.quiz-live .quiz-result h3{font-size:24px}.quiz-live #quiz-stage{min-height:0}}
+
+/* v6.6: consistent mobile heading, centered header and proportional photo. */
+.button,.catalog-filters button,.card-detail,.quiz-back,.quiz-edit,.gallery-more{min-height:44px}
+.hero-button{min-height:48px;white-space:normal;text-align:center}
+.hero-call{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center}
+.hero-call img{width:48px;height:48px;object-fit:contain}
+.hero-actions{max-width:calc(100% - 28px)}
+.video-controls button,.review-videos .video-controls button{min-width:44px;min-height:44px}
+@media(max-width:900px){
+ .header{height:72px;padding-top:0;align-items:center}
+ .brand{font-size:16px;line-height:24px}
+ .menu-toggle{width:44px;height:44px;flex:0 0 44px;padding:0;align-items:center;justify-content:center}
+ .header nav{top:66px}
+ .hero-actions{right:14px;bottom:14px;gap:12px}
+ .hero-button{font-size:16px;padding:12px 22px;min-height:48px}
+}
+@media(max-width:600px){
+ .hero-heading{height:auto;min-height:0;padding:24px 0 36px}
+ .hero h1{font-size:33px;line-height:1.04;letter-spacing:-.02em}
+ .hero h1 span{white-space:normal;max-width:100%;overflow-wrap:normal}
+ .hero h1 span:last-child{margin-left:0;margin-top:0;text-align:right}
+ .hero-mark{top:24px;width:32px}
+ .hero-photo{aspect-ratio:4/3}
+ .hero-photo>img{width:100%;height:100%;object-fit:cover;object-position:center}
+ .hero-button{width:auto;font-size:16px;min-height:48px;padding:12px 20px}
+ .hero-call,.hero-call img{width:48px;height:48px}
+}
