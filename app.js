@@ -7,12 +7,135 @@
   const manager='https://t.me/mariya_robbi';
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   const questions=[
-    {key:'size',title:'Какой размер щенка вам ближе?',options:[['Микро','Ориентир веса: 1,5–2,5 кг'],['Мини','Ориентир веса: 2,5–3,5 кг'],['Стандарт','Ориентир веса: 3,5+ кг'],['Пока не знаю','Поможем определиться.']]},
-    {key:'purpose',title:'Для кого выбираете щенка?',options:[['Для себя',''],['В подарок','']]},
-    {key:'gender',title:'Мальчик или девочка?',options:[['Мальчик',''],['Девочка',''],['Не принципиально','']]},
-    {key:'color',title:'Какой окрас вам нравится?',options:[['Платиновый (белый)',''],['Абрикосовый',''],['Редбраун (коричневый)',''],['Кремовый',''],['Серый',''],['Чёрный',''],['Ещё не решил(-а)','']]},
-    {key:'timing',title:'Когда планируете забрать малыша?',options:[['Сейчас',''],['До 2 недель',''],['Ещё выбираю',''],['Не срочно','']]}
-  ];
+  {
+    "key": "size",
+    "title": "Какого размера щенка хотите?",
+    "note": "Ориентир — вес взрослого малыша",
+    "options": [
+      [
+        "Микро",
+        "1,5–2,5 кг"
+      ],
+      [
+        "Мини",
+        "2,5–3,5 кг"
+      ],
+      [
+        "Стандарт",
+        "3,5+ кг"
+      ],
+      [
+        "Ещё не решил(а)",
+        "Поможем подобрать размер"
+      ]
+    ],
+    "muted": [
+      3
+    ]
+  },
+  {
+    "key": "purpose",
+    "title": "Для себя или в подарок?",
+    "note": "",
+    "options": [
+      [
+        "Для себя",
+        ""
+      ],
+      [
+        "В подарок",
+        ""
+      ]
+    ],
+    "muted": []
+  },
+  {
+    "key": "gender",
+    "title": "Мальчик или девочка?",
+    "note": "",
+    "options": [
+      [
+        "Мальчик",
+        ""
+      ],
+      [
+        "Девочка",
+        ""
+      ],
+      [
+        "Не принципиально",
+        "Покажем и тех, и других"
+      ]
+    ],
+    "muted": [
+      2
+    ]
+  },
+  {
+    "key": "color",
+    "title": "Какой окрас вам нравится?",
+    "note": "Выберите предпочтительный окрас\nНаличие уточним при подборе",
+    "options": [
+      [
+        "Платиновый (белый)",
+        ""
+      ],
+      [
+        "Абрикосовый",
+        ""
+      ],
+      [
+        "Ред браун (коричневый)",
+        ""
+      ],
+      [
+        "Кремовый",
+        ""
+      ],
+      [
+        "Серый",
+        ""
+      ],
+      [
+        "Чёрный",
+        ""
+      ],
+      [
+        "Ещё не решил(а)",
+        ""
+      ]
+    ],
+    "muted": [
+      6
+    ]
+  },
+  {
+    "key": "timing",
+    "title": "Когда планируете забрать малыша?",
+    "note": "",
+    "options": [
+      [
+        "Сейчас",
+        "заберём в ближайшие дни"
+      ],
+      [
+        "До 2 недель",
+        "планируем в этом месяце"
+      ],
+      [
+        "Ещё выбираю",
+        "Сравниваю окрас и размер"
+      ],
+      [
+        "Не срочно",
+        "Присматриваюсь на будущее"
+      ]
+    ],
+    "muted": [
+      3
+    ]
+  }
+];
   const answers={};let step=0,advanceTimer=null;
   function telegramDraft(photo=''){
     const text=['Здравствуйте! Хочу получить подборку щенков с ценами.'];
@@ -29,9 +152,14 @@
     clearTimeout(advanceTimer);
     $('#quiz-back').hidden=step===0||step===questions.length;$('#quiz-progress').textContent=step<questions.length?`Вопрос ${step+1} из ${questions.length}`:'Подборка по вашим ответам';
     $('#quiz-progress-bar').value=Math.min(step+1,questions.length);
+    const finished=step===questions.length;
+    $('.selection-panel').classList.toggle('is-result',finished);
+    $('.quiz-progress').hidden=finished;$('.quiz-side').hidden=finished;
+    $('#quiz-progress-count').textContent=`${Math.min(step+1,questions.length)}/${questions.length}`;
+    $('#quiz-navigation').hidden=finished;
     if(step<questions.length){
       const q=questions[step];
-      $('#quiz-stage').innerHTML=`<fieldset><legend tabindex="-1">${readableText(q.title)}</legend><div class="quiz-options">${q.options.map(([title,description],i)=>`<button type="button" class="quiz-option" data-answer="${i}" aria-pressed="${answers[q.key]===title}"><strong>${readableText(title)}</strong>${description?`<small>${readableText(description).replace(/(\d+,\d+(?:–\d+,\d+|\+) кг)$/, '<span style="white-space:nowrap">$1</span>')}</small>`:''}<span class="option-indicator" aria-hidden="true"></span></button>`).join('')}</div></fieldset>`;
+      $('#quiz-stage').innerHTML=`<fieldset><legend tabindex="-1">${readableText(q.title)}</legend>${q.note?`<p class="quiz-step-note">${readableText(q.note).replace(/\n/g,'<br>')}</p>`:''}<div class="quiz-options">${q.options.map(([title,description],i)=>`<button type="button" class="quiz-option${q.muted.includes(i)?' quiz-option-undecided':''}" data-answer="${i}" aria-pressed="${answers[q.key]===title}"><span class="quiz-option-body"><strong>${readableText(title)}</strong>${description?`<small>${readableText(description).replace(/(\d+,\d+(?:–\d+,\d+|\+) кг)$/, '<span style="white-space:nowrap">$1</span>')}</small>`:''}</span><span class="option-indicator" aria-hidden="true"><svg viewBox="0 0 12 10" fill="none"><path d="M1 5 4.5 8.5 11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`).join('')}</div></fieldset>`;
       $$('[data-answer]',$('#quiz-stage')).forEach(button=>button.addEventListener('click',()=>{
         clearTimeout(advanceTimer);answers[q.key]=q.options[Number(button.dataset.answer)][0];
         $$('[data-answer]',$('#quiz-stage')).forEach(other=>other.setAttribute('aria-pressed',String(other===button)));
@@ -47,7 +175,7 @@
   $('#quiz-back').addEventListener('click',()=>{clearTimeout(advanceTimer);if(step>0){step--;renderQuiz(true);}});
   $$('[data-size]').forEach(button=>button.addEventListener('click',()=>{
     $$('[data-size]').forEach(other=>{const active=other===button;other.classList.toggle('active',active);other.setAttribute('aria-pressed',String(active));});
-    clearTimeout(advanceTimer);answers.size=button.dataset.size==='Любой'?'Пока не знаю':button.dataset.size;
+    clearTimeout(advanceTimer);answers.size=button.dataset.size==='Любой'?'Ещё не решил(а)':button.dataset.size;
     step=0;renderQuiz();$('#selection').scrollIntoView({behavior:reduced()?'instant':'smooth'});
   }));
   $$('[data-inquire]').forEach(link=>link.addEventListener('click',()=>{link.href=telegramDraft(link.dataset.inquire);}));
